@@ -13,7 +13,8 @@ class SchedulerData
 	int _quantum;
 public:
 	explicit SchedulerData(int quantum);
-	bool empty() const { return _totalPackets == 0; };
+	bool isEmpty() const { return _totalPackets <= 0; }
+	void resetAllFlowsCredit();
 	/* list of flow pairs, every tuple contains queues of packets and the flow weight and current credit */
 	std::vector<std::tuple<std::queue<Packet>, int, int>> _allFlowTuples;
 	/* map of all flows currently handled by the manager. key is flowID and value is the index

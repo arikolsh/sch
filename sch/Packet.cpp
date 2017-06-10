@@ -1,6 +1,10 @@
 
 #include "Packet.h"
 
+Packet::Packet() : _ID(-1), _arrivalTime(0), _length(0)
+{
+}
+
 Packet::Packet(long id, long time, int length, std::string flowID) :
 	_ID(id), _arrivalTime(time), _length(length), _flowID(flowID)
 {
@@ -28,6 +32,6 @@ std::string Packet::getFlowID() const
 
 std::ostream& operator<<(std::ostream& str, Packet const& p)
 {
-	str << p._ID; //return id
+	str << p._arrivalTime << " " << p._ID << " " << p._flowID << " " << p._length; //return id
 	return str;
 }

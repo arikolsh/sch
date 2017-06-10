@@ -12,11 +12,8 @@ class Packet
 	/*flow id*/
 	std::string _flowID;
 public:
-	Packet() : _ID(-1), _arrivalTime(0), _length(0)
-	{
-	}
-
-	Packet(long id, long time, int length, std::string flowID);
+	explicit Packet();
+	explicit Packet(long id, long time, int length, std::string flowID);
 	long getID() const;
 	long getArrivalTime() const;
 	int getLength() const;

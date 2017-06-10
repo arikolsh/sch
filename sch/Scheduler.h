@@ -8,9 +8,11 @@ class Scheduler
 	SchedulerData _flowsData;
 	std::ifstream _inputFile;
 	std::ofstream _outputFile;
-	bool _isEOF = false;
-	int _currentTime = -1;
-	int _currentFlowIndex = 0;
+	bool _isEOF;
+	Packet _lastReceivedPacket;
+	int _lastReceivedPacketWeight;
+	int _currentTime;
+	int _currentFlowIndex;
 public:
 
 	explicit Scheduler(int weight, int quantum);
@@ -22,7 +24,7 @@ public:
 	* put weight of packet in weight: if not first packet of flow weight will be default weight. this is okay because
 	* the actual weight of the flow was already determined and put in the flows Data structure.
 	*/
-	Packet receivePacket(int& weight);
+	Packet getPacketFromFile(int& weight);
 	/* read packets from file up to given time */
 	void getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight);
 };
