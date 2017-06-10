@@ -3,9 +3,12 @@
 #include <sstream>
 using namespace std;
 Scheduler::Scheduler(int defaultWeight, int quantum) :
-	_defaultWeight(defaultWeight), _flowsData(quantum), _lastReceivedPacketWeight(defaultWeight), _currentTime(0), _currentFlowIndex(0), _isEOF(false)
+	_defaultWeight(defaultWeight), _flowsData(quantum)
 {
 }
+
+Scheduler::Scheduler(string schedulerType, int default_weight, int quantum) : 
+	_defaultWeight(default_weight), _schedulerType(schedulerType), _flowsData(quantum){}
 
 Scheduler::~Scheduler()
 {
@@ -18,7 +21,7 @@ bool Scheduler::init(const string&  inPath, const string&  outPath)
 	_inputFile = ifstream(inPath);
 	_outputFile = ofstream(outPath);
 	if (!_inputFile.is_open()) {
-		cout << "Error: failed to open file " << inPath << endl;
+		cout << "Error: failed to open input file: " << inPath << endl;
 		return false;
 	}
 	//check if file not empty
@@ -28,7 +31,7 @@ bool Scheduler::init(const string&  inPath, const string&  outPath)
 	_inputFile.clear();
 	_inputFile.seekg(0);
 	if (!_outputFile.is_open()) {
-		cout << "Error: failed to open file " << outPath << endl;
+		cout << "Error: failed to open output file: " << outPath << endl;
 		return false;
 	}
 	return true;
@@ -64,7 +67,6 @@ void Scheduler::start()
 		_currentTime += packet.getLength();
 		cout << "current time is now: " << _currentTime << endl;
 	}
-
 }
 
 Packet Scheduler::getPacketFromFile(int& weight)
@@ -98,18 +100,4 @@ Packet Scheduler::getPacketFromFile(int& weight)
 	weight = packetParams.size() > 7 ? stoi(packetParams[7]) : _defaultWeight;
 	packet = Packet(pktID, pktTime, pktLen, flowID); //-> valid packet
 	return packet;
-}
-
-void Scheduler::getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight)
-{
-	if (_isEOF || _currentTime < lastReceivedPacket.getArrivalTime())
-	{
-		return;
-	}
-	do
-	{	// add last packet to data struct until current time allows
-		_flowsData.addPacket(lastReceivedPacket, lastReceivedPacketWeight);
-		lastReceivedPacket = getPacketFromFile(lastReceivedPacketWeight);
-
-	} while (!_isEOF && lastReceivedPacket.getArrivalTime() <= _currentTime);
 }
