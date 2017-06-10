@@ -6,6 +6,7 @@
 #include <sstream>
 #include "Packet.h"
 #include "SchedulerData.h"
+#include "Scheduler.h"
 
 using namespace std;
 /*
@@ -20,6 +21,22 @@ void getPacketsUpToTime(int defaultWeight, SchedulerData flowsDataStruct, bool& 
 
 int main(int argc, char* argv[])
 {
+
+
+	bool isEOF = false;
+	Scheduler scheduler(1, 0);
+	bool isSuccess = scheduler.init("inp.txt", "out.txt");
+	if(!isSuccess)
+	{
+		return 0;
+	}
+	scheduler.start();
+
+
+	bool debug2 = true;
+	if (debug2) return 0;
+	SchedulerData flowsDataStruct;
+
 	bool debug1 = true;
 	string inputPath;
 	string outputPath;
