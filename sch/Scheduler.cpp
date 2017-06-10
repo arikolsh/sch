@@ -46,8 +46,6 @@ void Scheduler::start()
 
 			//get next packet from file, update _lastReceivedPacketWeight and _isEOF
 			_lastReceivedPacket = getPacketFromFile(_lastReceivedPacketWeight);
-			cout << "current time: " << _currentTime << endl;
-			cout << "last received packet: " << _lastReceivedPacket << endl;
 		}
 		if (_flowsData.isEmpty())
 		{
@@ -58,11 +56,10 @@ void Scheduler::start()
 			continue;
 		}
 		Packet packet = _flowsData.getNextPacketToSend(_currentFlowIndex);
-		cout << _currentTime << ": " << packet << " SENT" << endl; //send packet
+		
 		_outputFile << _currentTime << ": " << packet.getID() << endl; //send packet
 
 		_currentTime += packet.getLength();
-		cout << "current time is now: " << _currentTime << endl;
 	}
 
 }
@@ -73,7 +70,6 @@ Packet Scheduler::getPacketFromFile(int& weight)
 	Packet packet; //default constructor -> invalid packet
 	if (!getline(_inputFile, line)) //reached eof
 	{
-		cout << "reaced end of file!" << endl;
 		_isEOF = true;
 		return packet;
 	}

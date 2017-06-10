@@ -1,5 +1,4 @@
 #include "SchedulerData.h"
-#include <iostream>
 using namespace std;
 SchedulerData::SchedulerData(int quantum) : _quantum(quantum)
 {
@@ -17,19 +16,9 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 {
 	if (packet.getID() < 0) //not valid packet, drop
 	{
-		for (int i = 0; i < _allFlowTuples.size(); i++)
-		{
-			cout << "flow: " << i << " contains queue:" << endl;
-			auto q = get<0>(_allFlowTuples[i]);
-			for (int j = 0; j < q.size(); j++)
-			{
-				cout << q.front() << endl;
-				q.pop();
-			}
-		}
 		return;
 	}
-	cout << "adding packet: " << packet << endl;
+	//cout << "adding packet: " << packet << endl;
 	Packet packetReceived = packet;
 	if (_flows.find(packetReceived.getFlowID()) != _flows.end()) // flow already in dataStruct
 	{
@@ -44,17 +33,6 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 		tuple <queue<Packet>, int, int> flowTuple = make_tuple(flowQueue, weight, 0);
 		_allFlowTuples.push_back(flowTuple);
 		_flows[packetReceived.getFlowID()] = _allFlowTuples.size() - 1; // put flow index in map
-	}
-
-	for (int i = 0; i < _allFlowTuples.size(); i++)
-	{
-		cout << "flow: " << i << " contains queue:" << endl;
-		auto q = get<0>(_allFlowTuples[i]);
-		for (int j = 0; j < q.size(); j++)
-		{
-			cout << q.front() << endl;
-			q.pop();
-		}
 	}
 
 	_totalPackets++;
@@ -82,6 +60,7 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 			credit = MAX(credit - packet.getLength(), 0);
 			if (flowQueue.empty() || credit < (flowQueue.front()).getLength())
 			{
+				if (flowQueue.empty()) { credit = 0; }
 				currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
 			}
 			return packet;
