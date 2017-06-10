@@ -8,10 +8,16 @@
 #include "SchedulerData.h"
 #include "Scheduler.h"
 
-
 using namespace std;
-/* get packet from file and put in appropriate queue in dataStruct. if reached EOF update isEOF to true.*/
-void receivePacket(SchedulerData &flowsDataStruct, ifstream &inputFile, int defaultWeight, bool &isEOF);
+/*
+ * get packet from file and put in appropriate queue in dataStruct. if reached EOF update isEOF to true.
+ * put weight of packet in weight: if not first packet of flow weight will be default weight. this is okay because
+ * the actual weight of the flow was already determined and put in the flows Data structure.
+ */
+Packet receivePacket(SchedulerData& flowsDataStruct, ifstream& inputFile, int defaultWeight, bool& isEOF, int& weight);
+/* read packets from file up to given time */
+void getPacketsUpToTime(int defaultWeight, SchedulerData flowsDataStruct, bool& isEOF, ifstream& inputFile,
+	long currentTime, Packet& lastPacket, int& lastPacketWeight);
 
 int main(int argc, char* argv[])
 {
@@ -35,7 +41,17 @@ int main(int argc, char* argv[])
 	string inputPath;
 	string outputPath;
 	int defaultWeight;
-	int quantum;
+	int quantum = 0;
+	bool isEOF = false;
+	inputPath = "inp.txt"; //debug1
+	outputPath = "out.txt"; //debug1 
+	defaultWeight = 1; //debug 1
+	long currentTime = 0;
+	Packet lastPacket;
+	int lastPacketWeight = defaultWeight;
+	int currentFlowIndex = 0;
+	Packet packet;
+
 	if (!debug1) {
 		if (argc != 5)
 		{
@@ -48,6 +64,9 @@ int main(int argc, char* argv[])
 		quantum = stoi(argv[4]);
 	}
 
+
+	SchedulerData flowsDataStruct(quantum);
+
 	ifstream inputFile(inputPath);
 	ofstream outputFile(outputPath);
 	if (!inputFile.is_open()) {
@@ -58,34 +77,52 @@ int main(int argc, char* argv[])
 		cout << "Error: failed to open file " << outputPath << endl;
 		return -1;
 	}
-	// todo: need to receive packets as long as packet time is equal to current time. then dispatch packets from dataStruct until reached last received packet time
-	// todo: need to put this in some kind of while (true) loop
-	if (!isEOF) {
-		receivePacket(flowsDataStruct, inputFile, defaultWeight, isEOF);
+
+	// Try to read first line in file to make sure it isn't empty: 
+	lastPacket = receivePacket(flowsDataStruct, inputFile, defaultWeight, isEOF, lastPacketWeight);
+	if (isEOF)
+	{
+		return 0;
 	}
 
-	cout << flowsDataStruct._flowQueueWeightPairs[0].first.front() << endl; //debug
-	cout << flowsDataStruct._flowQueueWeightPairs[0].first.front().getFlowID() << endl; //debug
+	// scheduler runs in while loop until finishing file and sending all packets
+	while (true)
+	{
+		if (flowsDataStruct.empty()) {
+			if (isEOF)
+			{
+				//close things if needed
+				return 0;
+			}
+			if (lastPacket.getArrivalTime() > currentTime)
+			{
+				currentTime = lastPacket.getArrivalTime();
+				currentFlowIndex = 0;
+			}
+		}
 
-	if (!isEOF) {
-		receivePacket(flowsDataStruct, inputFile, defaultWeight, isEOF);
+		getPacketsUpToTime(defaultWeight, flowsDataStruct, isEOF, inputFile, currentTime, lastPacket, lastPacketWeight);
+
+		packet = flowsDataStruct.getNextPacketToSend(currentFlowIndex);
+
+		currentTime += packet.getLength();
+
+		outputFile << currentTime << ": " << packet << endl;
+
 	}
-
-	cout << flowsDataStruct._flowQueueWeightPairs[1].first.front() << endl; //debug
-	cout << flowsDataStruct._flowQueueWeightPairs[1].first.front().getFlowID() << endl; //debug
-
-	//todo: dispatchPacket() in some kind of loop
-
-
 }
 
-void receivePacket(SchedulerData &flowsDataStruct, ifstream &inputFile, int defaultWeight, bool& isEOF)
+
+
+
+Packet receivePacket(SchedulerData& flowsDataStruct, ifstream& inputFile, int defaultWeight, bool& isEOF, int& weight)
 {
 	string line;
+	Packet packet;
 	if (!getline(inputFile, line)) //reached eof
 	{
 		isEOF = true;
-		return;
+		return packet;
 	}
 	stringstream lineStream(line);
 	string param;
@@ -105,6 +142,27 @@ void receivePacket(SchedulerData &flowsDataStruct, ifstream &inputFile, int defa
 	long pktID = stol(packetParams[0]);
 	long pktTime = stol(packetParams[1]);
 	int pktLen = stoi(packetParams[6]);
-	int weight = packetParams.size() > 7 ? stoi(packetParams[7]) : defaultWeight;
-	flowsDataStruct.addPacket(pktID, pktTime, pktLen, flowID, weight);
+	weight = packetParams.size() > 7 ? stoi(packetParams[7]) : defaultWeight;
+	packet = Packet(pktID, pktTime, pktLen, flowID);
+	return packet;
+}
+void getPacketsUpToTime(int defaultWeight, SchedulerData flowsDataStruct, bool& isEOF, ifstream& inputFile,
+	long currentTime, Packet& lastPacket, int& lastPacketWeight)
+{
+	if (isEOF)
+	{
+		return;
+	}
+	int lastPacketTime = lastPacket.getArrivalTime();
+	if (currentTime < lastPacketTime)
+	{
+		//cant read yet
+		return;
+	}
+	do
+	{	// add last packet to data struct until current time allows
+		flowsDataStruct.addPacket(lastPacket, lastPacketWeight);
+		lastPacket = receivePacket(flowsDataStruct, inputFile, defaultWeight, isEOF, lastPacketWeight);
+
+	} while (!isEOF && lastPacket.getArrivalTime() <= currentTime);
 }
