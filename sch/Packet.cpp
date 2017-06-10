@@ -1,10 +1,7 @@
-
 #include "Packet.h"
 
 Packet::Packet(long id, long time, int length, std::string flowID) :
-	_ID(id), _arrivalTime(time), _length(length), _flowID(flowID)
-{
-}
+	_ID(id), _arrivalTime(time), _length(length), _flowID(flowID) {}
 
 long Packet::getID() const
 {

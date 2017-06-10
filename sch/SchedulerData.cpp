@@ -6,24 +6,22 @@ SchedulerData::SchedulerData(int quantum) : _quantum(quantum)
 
 void SchedulerData::addPacket(Packet& packet, int weight)
 {
-	if (packet.getID() < 0) //not valid packet, drop
-	{
-		return;
-	}
+	if (packet.getID() < 0)	{ return; } //not valid packet, drop
 	// construct packet
 	Packet packetReceived = packet;
-	if (_flows.find(packetReceived.getFlowID()) != _flows.end()) // flow already in dataStruct
+	auto iter = _flowsMap.find(packetReceived.getFlowID());
+	if (iter != _flowsMap.end()) // flow already in dataStruct
 	{
-		int flowIndex = _flows.find(packetReceived.getFlowID())->second;
-		get<0>(_allFlowTuples[flowIndex]).push(packetReceived); //put packet in queue
+		int flowIndex = iter->second;
+		get<0>(_allFlows[flowIndex]).push(packetReceived); //push packet to existing queue
 	}
 	else  // encountered new flow, init new queue for this flow
 	{
 		queue<Packet> flowQueue;
 		flowQueue.push(packetReceived);
-		tuple <queue<Packet>, int, int> flowTuple = make_tuple(flowQueue, weight, 0);
-		_allFlowTuples.push_back(flowTuple);
-		_flows[packetReceived.getFlowID()] = _allFlowTuples.size() - 1; // put flow index in map
+		auto flowTuple = make_tuple(flowQueue, weight, 0);
+		_allFlows.push_back(flowTuple);
+		_flowsMap[packetReceived.getFlowID()] = _allFlows.size() - 1; // add flow index to map
 	}
 }
 
@@ -31,15 +29,15 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 {
 	//todo: check, probably not correct
 	while (true) {
-		while (get<0>(_allFlowTuples[currFlow]).empty())
+		while (get<0>(_allFlows[currFlow]).empty())
 		{
-			get<2>(_allFlowTuples[currFlow]) = 0; //second time we arrived to this flow, zero credit
-			currFlow = (currFlow + 1) % _allFlowTuples.size();
+			get<2>(_allFlows[currFlow]) = 0; //second time we arrived to this flow, zero credit
+			currFlow = (currFlow + 1) % _allFlows.size();
 		}
-		auto flowQueue = get<0>(_allFlowTuples[currFlow]);
+		auto flowQueue = get<0>(_allFlows[currFlow]);
 		Packet packet = flowQueue.front(); //get packet from queue
-		int weight = get<1>(_allFlowTuples[currFlow]);
-		int& credit = get<2>(_allFlowTuples[currFlow]);
+		int weight = get<1>(_allFlows[currFlow]);
+		int& credit = get<2>(_allFlows[currFlow]);
 		credit += weight*_quantum;
 		if (packet.getLength() <= credit)
 		{ //able to send
@@ -47,7 +45,7 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 			_totalPackets--;
 			return packet;
 		}
-		currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
+		currFlow = (currFlow + 1) % _allFlows.size(); // Go to next flow
 	}
 
 }

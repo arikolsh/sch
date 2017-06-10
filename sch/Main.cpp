@@ -1,11 +1,7 @@
 #include <ostream>
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <vector>
-#include <sstream>
-#include "Packet.h"
-#include "SchedulerData.h"
 #include "Scheduler.h"
 
 using namespace std;
@@ -18,26 +14,20 @@ using namespace std;
 * 4) default_weight (integer) - for the flows
 * 5) quantum (integer) - 0 for "RR" or the quantum size in bytes for "DRR" scheduler
 * Examples:   sch.exe DRR input_file.txt output_file.txt 10 64	 OR	  sch.exe RR input_file.txt output_file.txt 1 0 */
-
 bool validCmdArgs(int argc, char** argv, string &schedulerType, string &input_file, string &output_file, int &default_weight, int &quantum);
 
 int main(int argc, char* argv[])
 {
 	string schedulerType, input_file, output_file; 
 	int default_weight, quantum;
-	if (!validCmdArgs(argc, argv, schedulerType, input_file, output_file, default_weight, quantum))
-	{
-		return 1;
-	}
-
-	Scheduler scheduler(1, 0);
-	bool isSuccess = scheduler.init("inp.txt", "out.txt");
-	if (!isSuccess)
-	{
-		return 0;
-	}
+	if (!validCmdArgs(argc, argv, schedulerType, input_file, output_file, default_weight, quantum)) { return 1; }
+	Scheduler scheduler(schedulerType, default_weight, quantum);
+	if (!scheduler.init(input_file, output_file)) {	return 0; }
 	scheduler.start();
+	return 0;
 }
+
+
 
 bool validCmdArgs(int argc, char** argv, string &schedulerType, string &input_file, string &output_file, int &default_weight, int &quantum)
 {

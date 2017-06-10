@@ -2,10 +2,9 @@
 #include <iostream>
 #include <sstream>
 using namespace std;
-Scheduler::Scheduler(int defaultWeight, int quantum) :
-	_defaultWeight(defaultWeight), _flowsData(quantum)
-{
-}
+
+Scheduler::Scheduler(string schedulerType, int default_weight, int quantum) : 
+	_defaultWeight(default_weight), _schedulerType(schedulerType), _flowsData(quantum){}
 
 Scheduler::~Scheduler()
 {
@@ -18,11 +17,11 @@ bool Scheduler::init(const string&  inPath, const string&  outPath)
 	_inputFile = ifstream(inPath);
 	_outputFile = ofstream(outPath);
 	if (!_inputFile.is_open()) {
-		cout << "Error: failed to open file " << inPath << endl;
+		cout << "Error: failed to open input file: " << inPath << endl;
 		return false;
 	}
 	if (!_outputFile.is_open()) {
-		cout << "Error: failed to open file " << outPath << endl;
+		cout << "Error: failed to open output file: " << outPath << endl;
 		return false;
 	}
 	return true;
@@ -30,14 +29,13 @@ bool Scheduler::init(const string&  inPath, const string&  outPath)
 
 void Scheduler::start()
 {
-	Packet lastPacketReceived; //first packet with time 0 and id -1
+	Packet packetToSend, lastPacketReceived; //first packet with time 0 and id -1
 	int lastWeightReceived = _defaultWeight;
-	// scheduler runs in while loop until finishing file and sending all packets
-	while (true)
+	while (true) // scheduler runs in while loop until finishing file and sending all packets
 	{
 		getPacketsUpToCurrentTime(lastPacketReceived, lastWeightReceived);
-		Packet packet = _flowsData.getNextPacketToSend(_currentFlowIndex);
-		_currentTime += packet.getLength();
+		packetToSend = _flowsData.getNextPacketToSend(_currentFlowIndex);
+		_currentTime += packetToSend.getLength(); // increment time after each packet is sent
 	}
 }
 

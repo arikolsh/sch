@@ -6,19 +6,29 @@
 #include <map>
 #include <fstream>
 
+using namespace std;
+
 class SchedulerData
 {
-	//todo: setters and getters.. and put members in private
-	long _totalPackets = 0;
-	int _quantum;
 public:
 	explicit SchedulerData(int quantum);
+	
 	bool empty() const { return _totalPackets == 0; };
-	/* list of flow pairs, every tuple contains queues of packets and the flow weight and current credit */
-	std::vector<std::tuple<std::queue<Packet>, int, int>> _allFlowTuples;
-	/* map of all flows currently handled by the manager. key is flowID and value is the index
-	* of its specific packet queue in _allFlowTuples. */
-	std::map<std::string, int> _flows;
+	
+	/* A vector that contains all flows -
+	 * each flow is represented by a tuple of: 
+	 * 1) the packets queue for this flow, 2) the flow weight and 3) the current credit */
+	vector<tuple<queue<Packet>, int, int>> _allFlows;
+	
+	/* map of all flows currently handled by the manager. 
+	 * key = flowID and value = index of this flow in _allFlows. */
+	map<string, int> _flowsMap;
+	
 	void SchedulerData::addPacket(Packet& packet, int weight);
+	
 	Packet getNextPacketToSend(int& currFlow);
+
+private:
+	long _totalPackets = 0;
+	int _quantum;
 };
