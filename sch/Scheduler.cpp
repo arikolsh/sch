@@ -30,32 +30,14 @@ bool Scheduler::init(const string&  inPath, const string&  outPath)
 
 void Scheduler::start()
 {
-	// Try to read first line in file to make sure it isn't empty: 
-	int receivedPacketWeight = _defaultWeight;
-	Packet lastPacket = receivePacket(receivedPacketWeight);
-	if (_isEOF)
-	{
-		return;
-	}
+	Packet lastPacketReceived; //first packet with time 0 and id -1
+	int lastWeightReceived = _defaultWeight;
 	// scheduler runs in while loop until finishing file and sending all packets
 	while (true)
 	{
-		if (_flowsData.empty()) {
-			if (_isEOF)
-			{
-				return;
-			}
-			if (lastPacket.getArrivalTime() > _currentTime)
-			{
-				_currentTime = lastPacket.getArrivalTime();
-				_currentFlowIndex = 0;
-			}
-		}
-
-		getPacketsUpToTime(lastPacket, receivedPacketWeight);
+		getPacketsUpToCurrentTime(lastPacketReceived, lastWeightReceived);
 		Packet packet = _flowsData.getNextPacketToSend(_currentFlowIndex);
 		_currentTime += packet.getLength();
-		_outputFile << _currentTime << ": " << packet << endl;
 	}
 }
 
@@ -91,16 +73,10 @@ Packet Scheduler::receivePacket(int& weight)
 	return packet;
 }
 
-void Scheduler::getPacketsUpToTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight)
+void Scheduler::getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight)
 {
-	if (_isEOF)
+	if (_isEOF || _currentTime < lastReceivedPacket.getArrivalTime())
 	{
-		return;
-	}
-	int lastPacketTime = lastReceivedPacket.getArrivalTime();
-	if (_currentTime < lastPacketTime)
-	{
-		//cant read yet
 		return;
 	}
 	do

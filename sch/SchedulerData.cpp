@@ -29,9 +29,11 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 
 Packet SchedulerData::getNextPacketToSend(int& currFlow)
 {
+	//todo: check, probably not correct
 	while (true) {
 		while (get<0>(_allFlowTuples[currFlow]).empty())
 		{
+			get<2>(_allFlowTuples[currFlow]) = 0; //second time we arrived to this flow, zero credit
 			currFlow = (currFlow + 1) % _allFlowTuples.size();
 		}
 		auto flowQueue = get<0>(_allFlowTuples[currFlow]);
@@ -43,10 +45,6 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 		{ //able to send
 			flowQueue.pop(); //pop packet from queue
 			_totalPackets--;
-			if (flowQueue.empty())
-			{
-				credit = 0; //clear credit if queue got empty
-			}
 			return packet;
 		}
 		currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
