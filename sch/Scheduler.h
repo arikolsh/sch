@@ -6,13 +6,6 @@ using namespace std;
 
 class Scheduler
 {
-	int _defaultWeight;
-	SchedulerData _flowsData;
-	std::ifstream _inputFile;
-	std::ofstream _outputFile;
-	bool _isEOF = false;
-	int _currentTime = -1;
-	int _currentFlowIndex = 0;
 public:
 
 	explicit Scheduler(string schedulerType, int default_weight, int quantum);
@@ -25,8 +18,6 @@ public:
 	* the actual weight of the flow was already determined and put in the flows Data structure.
 	*/
 	Packet getPacketFromFile(int& weight);
-	/* read packets from file up to given time */
-	void getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight);
 
 private:
 	SchedulerData _flowsData; // This class object holds all the flows (and additional data) that served the scheduler
@@ -38,4 +29,6 @@ private:
 	ofstream _outputFile;
 	bool _isEOF = false;
 	bool _schedulerDone = false; // Set to true when reached EOF and all queues are empty
+	Packet _lastReceivedPacket;
+	int _lastReceivedPacketWeight;
 };

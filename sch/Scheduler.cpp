@@ -2,13 +2,11 @@
 #include <iostream>
 #include <sstream>
 using namespace std;
-Scheduler::Scheduler(int defaultWeight, int quantum) :
-	_defaultWeight(defaultWeight), _flowsData(quantum)
+
+Scheduler::Scheduler(string schedulerType, int default_weight, int quantum) :
+	_defaultWeight(default_weight), _schedulerType(schedulerType), _lastReceivedPacketWeight(default_weight), _flowsData(quantum)
 {
 }
-
-Scheduler::Scheduler(string schedulerType, int default_weight, int quantum) : 
-	_defaultWeight(default_weight), _schedulerType(schedulerType), _flowsData(quantum){}
 
 Scheduler::~Scheduler()
 {
