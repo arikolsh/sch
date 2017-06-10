@@ -1,0 +1,16 @@
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 3: Weight = 5, Credit = 0, Queue size = 0, Packets in queue: 
+flow 4: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 5: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 6: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 7: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 8: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 9: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 10: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 11: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 12: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+flow 13: Weight = 5, Credit = 320, Queue size = 0, Packets in queue: 

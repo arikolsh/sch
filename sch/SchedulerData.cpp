@@ -52,6 +52,7 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 }
 
 // Pass a path (like "log.txt") to write to a file or "stdout" to print to screen
+bool fileIsOpen;
 void SchedulerData::logSchedulerData(string out) const
 {
 	ostringstream stream;
@@ -78,8 +79,15 @@ void SchedulerData::logSchedulerData(string out) const
 	else
 	{
 		fstream outFile;
-		outFile.open(out);
-		outFile.seekg(0, ios::end);
+		if (!fileIsOpen)
+		{
+			outFile.open(out, fstream::out);
+		}
+		else
+		{
+			outFile.open(out);
+			outFile.seekg(0, ios::end);
+		}
 		outFile << stream.str();
 		outFile.close();
 	}
