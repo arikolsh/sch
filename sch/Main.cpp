@@ -6,6 +6,7 @@
 #include <sstream>
 #include "Packet.h"
 #include "SchedulerData.h"
+#include "Scheduler.h"
 
 
 using namespace std;
@@ -14,13 +15,27 @@ void receivePacket(SchedulerData &flowsDataStruct, ifstream &inputFile, int defa
 
 int main(int argc, char* argv[])
 {
+
+
+	bool isEOF = false;
+	Scheduler scheduler(1, 0);
+	bool isSuccess = scheduler.init("inp.txt", "out.txt");
+	if(!isSuccess)
+	{
+		return 0;
+	}
+	scheduler.start();
+
+
+	bool debug2 = true;
+	if (debug2) return 0;
+	SchedulerData flowsDataStruct;
+
 	bool debug1 = true;
 	string inputPath;
 	string outputPath;
 	int defaultWeight;
-	int quantum = 0;
-	SchedulerData flowsDataStruct;
-	bool isEOF = false;
+	int quantum;
 	if (!debug1) {
 		if (argc != 5)
 		{
@@ -32,9 +47,6 @@ int main(int argc, char* argv[])
 		defaultWeight = stoi(argv[3]);
 		quantum = stoi(argv[4]);
 	}
-	inputPath = "inp.txt"; //debug1
-	outputPath = "out.txt"; //debug1 
-	defaultWeight = 1; //debug 1
 
 	ifstream inputFile(inputPath);
 	ofstream outputFile(outputPath);
