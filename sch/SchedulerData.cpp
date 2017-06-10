@@ -20,6 +20,7 @@ void SchedulerData::clear()
 
 void SchedulerData::addPacket(Packet& packet, int weight)
 {
+	int flowIndex;
 	if (packet.getID() < 0) //not valid packet, drop
 	{
 		return;
@@ -28,7 +29,7 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 	Packet packetReceived = packet;
 	if (_flows.find(packetReceived.getFlowID()) != _flows.end()) // flow already in dataStruct
 	{
-		int flowIndex = _flows.find(packetReceived.getFlowID())->second;
+		flowIndex = _flows.find(packetReceived.getFlowID())->second;
 		queue<Packet>& queue = get<0>(_allFlowTuples[flowIndex]);
 		queue.push(packetReceived); //put packet in queue
 	}
@@ -38,9 +39,9 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 		flowQueue.push(packetReceived);
 		tuple <queue<Packet>, int, int> flowTuple = make_tuple(flowQueue, weight, 0);
 		_allFlowTuples.push_back(flowTuple);
-		_flows[packetReceived.getFlowID()] = _allFlowTuples.size() - 1; // put flow index in map
+		flowIndex = _allFlowTuples.size() - 1;
+		_flows[packetReceived.getFlowID()] = flowIndex; // put flow index in map
 	}
-
 	_totalPackets++;
 }
 

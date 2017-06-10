@@ -53,6 +53,7 @@ void Scheduler::start()
 			_flowsData.resetAllFlowsCredit();
 			_currentFlowIndex = 0;
 			_currentTime = _lastReceivedPacket.getArrivalTime();
+			_flowsData.clear();
 			continue;
 		}
 		//Packet packet = _flowsData.getNextPacketToSend(_currentFlowIndex);
