@@ -1,0 +1,56 @@
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 640, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+
+================ The Scheduler's data ===================
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 640, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 0, Queue size = 1, Packets in queue: 1 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 1280, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 0, Queue size = 1, Packets in queue: 1 
+flow 2: Weight = 2, Credit = 0, Queue size = 1, Packets in queue: 2 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 640, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 0, Queue size = 1, Packets in queue: 2 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 1280, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 0, Queue size = 1, Packets in queue: 2 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 128, Queue size = 0, Packets in queue: 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 640, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 2, Packets in queue: 6 8 
+flow 1: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 128, Queue size = 0, Packets in queue: 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 640, Queue size = 1, Packets in queue: 8 
+flow 1: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 1280, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 0, Queue size = 1, Packets in queue: 9 
+flow 2: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 
+
+================ The Scheduler's data ===================
+flow 0: Weight = 10, Credit = 0, Queue size = 0, Packets in queue: 
+flow 1: Weight = 10, Credit = 640, Queue size = 0, Packets in queue: 
+flow 2: Weight = 2, Credit = 0, Queue size = 0, Packets in queue: 

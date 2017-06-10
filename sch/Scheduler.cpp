@@ -33,6 +33,7 @@ void Scheduler::start()
 	int lastWeightReceived = _defaultWeight;
 	while (true) // scheduler runs in while loop until finishing file and sending all packets
 	{
+		_flowsData.logSchedulerData("stdout"); // Pass a path (like "log.txt") to write to a file or "stdout" to print to screen
 		cout << "lastPacketReceived: " << lastPacketReceived << endl;
 		getPacketsUpToCurrentTime(lastPacketReceived, lastWeightReceived);
 		if (_schedulerDone)

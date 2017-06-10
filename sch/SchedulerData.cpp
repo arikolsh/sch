@@ -1,4 +1,7 @@
 #include "SchedulerData.h"
+#include <sstream>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 SchedulerData::SchedulerData(int quantum) : _quantum(quantum) {}
@@ -48,4 +51,36 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 
 }
 
-
+// Pass a path (like "log.txt") to write to a file or "stdout" to print to screen
+void SchedulerData::logSchedulerData(string out) const
+{
+	ostringstream stream;
+	stream << "\n================ The Scheduler's data ===================" << endl;
+	for (int i = 0; i < _allFlows.size(); i++)
+	{
+		stream << "flow " << i << ": ";
+		auto flow_queue = get<0>(_allFlows[i]);
+		auto flow_weight = get<1>(_allFlows[i]);
+		auto flow_credit = get<2>(_allFlows[i]);
+		stream << "Weight = " << flow_weight << ", Credit = " << flow_credit;
+		stream << ", Queue size = " << flow_queue.size() << ", Packets in queue: ";
+		while (!flow_queue.empty())
+		{
+			stream << flow_queue.front() << " ";
+			flow_queue.pop();
+		}
+		stream << endl;
+	}
+	if (out == "stdout")
+	{
+		cout << stream.str() << endl;
+	}
+	else
+	{
+		fstream outFile;
+		outFile.open(out);
+		outFile.seekg(0, ios::end);
+		outFile << stream.str();
+		outFile.close();
+	}
+}

@@ -26,6 +26,8 @@ public:
 	
 	Packet getNextPacketToSend(int& currFlow);
 
+	void logSchedulerData(string out) const;
+
 private:
 	long _totalPackets = 0;
 	int _quantum;
