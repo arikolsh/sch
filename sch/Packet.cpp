@@ -1,5 +1,8 @@
 #include "Packet.h"
 
+Packet::Packet() : 
+	_ID(-1), _arrivalTime(0), _length(0), _flowID("") {}
+
 Packet::Packet(long id, long time, int length, std::string flowID) :
 	_ID(id), _arrivalTime(time), _length(length), _flowID(flowID) {}
 

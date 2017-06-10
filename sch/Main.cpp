@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
 	Scheduler scheduler(schedulerType, default_weight, quantum);
 	if (!scheduler.init(input_file, output_file)) {	return 0; }
 	scheduler.start();
+	cout << "Scheduler is done handling all packets!" << endl;
 	return 0;
 }
 

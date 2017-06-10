@@ -33,10 +33,34 @@ void Scheduler::start()
 	int lastWeightReceived = _defaultWeight;
 	while (true) // scheduler runs in while loop until finishing file and sending all packets
 	{
+		cout << "lastPacketReceived: " << lastPacketReceived << endl;
 		getPacketsUpToCurrentTime(lastPacketReceived, lastWeightReceived);
+		if (_schedulerDone)
+		{
+			return;
+		}
 		packetToSend = _flowsData.getNextPacketToSend(_currentFlowIndex);
+		cout << "packetToSend: " << packetToSend << endl;;
 		_currentTime += packetToSend.getLength(); // increment time after each packet is sent
 	}
+}
+
+void Scheduler::getPacketsUpToCurrentTime(Packet& lastPacketReceived, int& lastWeightReceived)
+{
+	if (_isEOF || _currentTime < lastPacketReceived.getArrivalTime())
+	{
+		if (_flowsData.empty()) // reached EOF and all queues are empty --> scheduler is done!
+		{
+			_schedulerDone = true;
+		}
+		return;
+	}
+	do
+	{	// add last packet to data struct until current time allows
+		_flowsData.addPacket(lastPacketReceived, lastWeightReceived);
+		lastPacketReceived = receivePacket(lastWeightReceived);
+
+	} while (!_isEOF && lastPacketReceived.getArrivalTime() <= _currentTime);
 }
 
 Packet Scheduler::receivePacket(int& weight)
@@ -69,18 +93,4 @@ Packet Scheduler::receivePacket(int& weight)
 	weight = packetParams.size() > 7 ? stoi(packetParams[7]) : _defaultWeight;
 	packet = Packet(pktID, pktTime, pktLen, flowID);
 	return packet;
-}
-
-void Scheduler::getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight)
-{
-	if (_isEOF || _currentTime < lastReceivedPacket.getArrivalTime())
-	{
-		return;
-	}
-	do
-	{	// add last packet to data struct until current time allows
-		_flowsData.addPacket(lastReceivedPacket, lastReceivedPacketWeight);
-		lastReceivedPacket = receivePacket(lastReceivedPacketWeight);
-
-	} while (!_isEOF && lastReceivedPacket.getArrivalTime() <= _currentTime);
 }

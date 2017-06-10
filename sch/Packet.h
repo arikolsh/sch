@@ -4,7 +4,7 @@
 class Packet
 {
 public:
-	Packet() : _ID(-1), _arrivalTime(0), _length(0) {}
+	Packet();
 	Packet(long id, long time, int length, std::string flowID);
 	long getID() const;
 	long getArrivalTime() const;

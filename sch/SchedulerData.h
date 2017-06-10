@@ -2,9 +2,7 @@
 #include <vector>
 #include <queue>
 #include "Packet.h"
-#include <memory>
 #include <map>
-#include <fstream>
 
 using namespace std;
 
@@ -13,7 +11,7 @@ class SchedulerData
 public:
 	explicit SchedulerData(int quantum);
 	
-	bool empty() const { return _totalPackets == 0; };
+	bool empty() const { return _totalPackets <= 0; };
 	
 	/* A vector that contains all flows -
 	 * each flow is represented by a tuple of: 
