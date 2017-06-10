@@ -64,7 +64,7 @@ void Scheduler::getPacketsUpToCurrentTime(Packet& lastPacketReceived, int& lastW
 	{
 		return;
 	}
-	if (_flowsData.empty())
+	if (_flowsData.empty() && _currentTime < lastPacketReceived.getArrivalTime())
 	{
 		_currentTime = lastPacketReceived.getArrivalTime();
 	}
@@ -76,7 +76,8 @@ void Scheduler::getPacketsUpToCurrentTime(Packet& lastPacketReceived, int& lastW
 	} while (!_isEOF && lastPacketReceived.getArrivalTime() <= _currentTime);
 }
 
-void Scheduler::sendPackets_WRR(int currFlow)
+int packets_sent = 0;
+void Scheduler::sendPackets_WRR(int& currFlow)
 {
 	if (_flowsData._totalPackets == 0) {
 		return; // All queues are empty --> Nothing to send
@@ -84,10 +85,10 @@ void Scheduler::sendPackets_WRR(int currFlow)
 	while (get<0>(_flowsData._allFlows[currFlow]).empty()) // Skip empty queues
 	{
 		currFlow = (currFlow + 1) % _flowsData._allFlows.size();
+		packets_sent = 0;
 	}
 	queue<Packet>& flowQueue = get<0>(_flowsData._allFlows[currFlow]); // The queue that should be served
 	int weight = get<1>(_flowsData._allFlows[currFlow]);
-	int packets_sent = 0;
 	while (!flowQueue.empty() && packets_sent < weight)
 	{
 		Packet packetToSend = flowQueue.front(); //get packet from queue
@@ -97,7 +98,11 @@ void Scheduler::sendPackets_WRR(int currFlow)
 		_outputFile << _currentTime << ": " << packetToSend.getID() << endl; //send packet
 		_currentTime += packetToSend.getLength(); // increment time after each packet is sent
 	}
-	currFlow = (currFlow + 1) % _flowsData._allFlows.size(); // Go to next flow
+	if (packets_sent == weight) // Finished serving this flow
+	{
+		currFlow = (currFlow + 1) % _flowsData._allFlows.size(); // Go to next flow
+		packets_sent = 0;
+	}
 }
 
 

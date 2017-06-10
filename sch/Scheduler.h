@@ -18,7 +18,7 @@ public:
 	Packet receivePacket(int& weight);
 	/* read packets from file up to given time */
 	void getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight);
-	void sendPackets_WRR(int currFlow);
+	void sendPackets_WRR(int& currFlow);
 
 private:
 	SchedulerData _flowsData; // This class object holds all the flows (and additional data) that served the scheduler
