@@ -23,12 +23,10 @@ int main(int argc, char* argv[])
 	if (!validCmdArgs(argc, argv, schedulerType, input_file, output_file, default_weight, quantum)) { return 1; }
 	Scheduler scheduler(schedulerType, default_weight, quantum);
 	if (!scheduler.init(input_file, output_file)) {	return 0; }
-	scheduler.start();
+	scheduler.run();
 	cout << "Scheduler is done handling all packets!" << endl;
 	return 0;
 }
-
-
 
 bool validCmdArgs(int argc, char** argv, string &schedulerType, string &input_file, string &output_file, int &default_weight, int &quantum)
 {
@@ -40,8 +38,9 @@ bool validCmdArgs(int argc, char** argv, string &schedulerType, string &input_fi
 	}
 	try
 	{
-		schedulerType = argv[1], input_file = argv[2], output_file = argv[3];
+		input_file = argv[2], output_file = argv[3];
 		default_weight = stoi(argv[4]), quantum = stoi(argv[5]);
+		schedulerType = argv[1] == "DRR" ? "DRR" : "RR"; // Treat "WRR" as "RR"
 	}
 	catch (...) //catch all exceptions
 	{

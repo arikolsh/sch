@@ -8,7 +8,7 @@ SchedulerData::SchedulerData(int quantum) : _quantum(quantum) {}
 
 void SchedulerData::addPacket(Packet& packet, int weight)
 {
-	if (packet.getID() < 0)	{ return; } //not valid packet, drop
+	if (packet.getID() < 0) { return; } //not valid packet, drop
 	auto iter = _flowsMap.find(packet.getFlowID());
 	if (iter != _flowsMap.end()) // flow already in dataStruct
 	{
@@ -26,11 +26,10 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 	}
 }
 
-Packet SchedulerData::getNextPacketToSend(int& currFlow)
+Packet SchedulerData::nextPacketToSend_DRR(int& currFlow)
 {
-	//todo: check, probably not correct
 	while (true) {
-		while (get<0>(_allFlows[currFlow]).empty())
+		while (get<0>(_allFlows[currFlow]).empty()) // Skip empty queues
 		{
 			get<2>(_allFlows[currFlow]) = 0; //second time we arrived to this flow, zero credit
 			currFlow = (currFlow + 1) % _allFlows.size();
@@ -48,7 +47,6 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 		}
 		currFlow = (currFlow + 1) % _allFlows.size(); // Go to next flow
 	}
-
 }
 
 // Pass a path (like "log.txt") to write to a file or "stdout" to print to screen

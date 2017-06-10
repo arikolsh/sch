@@ -24,11 +24,10 @@ public:
 	
 	void SchedulerData::addPacket(Packet& packet, int weight);
 	
-	Packet getNextPacketToSend(int& currFlow);
+	Packet nextPacketToSend_DRR(int& currFlow);
 
 	void logSchedulerData(string out) const;
 
-private:
 	long _totalPackets = 0;
 	int _quantum;
 };

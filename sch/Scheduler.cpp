@@ -27,24 +27,29 @@ bool Scheduler::init(const string&  inPath, const string&  outPath)
 	return true;
 }
 
-void Scheduler::start()
+void Scheduler::run()
 {
 	Packet packetToSend, lastPacketReceived; //first packet with time 0 and id -1
 	int lastWeightReceived = _defaultWeight;
 	while (true) // scheduler runs in while loop until finishing file and sending all packets
 	{
-		cout << "_currentTime = " << _currentTime << endl;
-		_flowsData.logSchedulerData("alog.txt"); // Pass a path (like "log.txt") to write to a file or "stdout" to print to screen
-		cout << "lastPacketReceived: " << lastPacketReceived << endl;
+		_flowsData.logSchedulerData("logSchedulerData.txt"); // Pass a path (like "log.txt") to write to a file or "stdout" to print to screen
 		getPacketsUpToCurrentTime(lastPacketReceived, lastWeightReceived);
 		if (_schedulerDone)
 		{
 			return;
 		}
-		packetToSend = _flowsData.getNextPacketToSend(_currentFlowIndex);
-		cout << "packetToSend: " << packetToSend << endl;
-		_outputFile << _currentTime << ": " << packetToSend.getID() << endl; //send packet
-		_currentTime += packetToSend.getLength(); // increment time after each packet is sent
+		if (_schedulerType == "DRR")  // DRR scheduling
+		{
+			packetToSend = _flowsData.nextPacketToSend_DRR(_currentFlowIndex);
+			_outputFile << _currentTime << ": " << packetToSend.getID() << endl; //send packet
+			_currentTime += packetToSend.getLength(); // increment time after each packet is sent
+		}
+		else // RR scheduling
+		{
+			sendPackets_WRR(_currentFlowIndex);
+		}
+
 	}
 }
 
@@ -69,6 +74,30 @@ void Scheduler::getPacketsUpToCurrentTime(Packet& lastPacketReceived, int& lastW
 		lastPacketReceived = receivePacket(lastWeightReceived);
 
 	} while (!_isEOF && lastPacketReceived.getArrivalTime() <= _currentTime);
+}
+
+void Scheduler::sendPackets_WRR(int currFlow)
+{
+	if (_flowsData._totalPackets == 0) {
+		return; // All queues are empty --> Nothing to send
+	}
+	while (get<0>(_flowsData._allFlows[currFlow]).empty()) // Skip empty queues
+	{
+		currFlow = (currFlow + 1) % _flowsData._allFlows.size();
+	}
+	queue<Packet>& flowQueue = get<0>(_flowsData._allFlows[currFlow]); // The queue that should be served
+	int weight = get<1>(_flowsData._allFlows[currFlow]);
+	int packets_sent = 0;
+	while (!flowQueue.empty() && packets_sent < weight)
+	{
+		Packet packetToSend = flowQueue.front(); //get packet from queue
+		flowQueue.pop(); //pop packet from queue
+		packets_sent++;
+		_flowsData._totalPackets--;
+		_outputFile << _currentTime << ": " << packetToSend.getID() << endl; //send packet
+		_currentTime += packetToSend.getLength(); // increment time after each packet is sent
+	}
+	currFlow = (currFlow + 1) % _flowsData._allFlows.size(); // Go to next flow
 }
 
 
