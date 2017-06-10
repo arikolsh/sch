@@ -33,6 +33,7 @@ void Scheduler::start()
 	int lastWeightReceived = _defaultWeight;
 	while (true) // scheduler runs in while loop until finishing file and sending all packets
 	{
+		cout << "_currentTime = " << _currentTime << endl;
 		_flowsData.logSchedulerData("alog.txt"); // Pass a path (like "log.txt") to write to a file or "stdout" to print to screen
 		cout << "lastPacketReceived: " << lastPacketReceived << endl;
 		getPacketsUpToCurrentTime(lastPacketReceived, lastWeightReceived);
@@ -41,7 +42,8 @@ void Scheduler::start()
 			return;
 		}
 		packetToSend = _flowsData.getNextPacketToSend(_currentFlowIndex);
-		cout << "packetToSend: " << packetToSend << endl;;
+		cout << "packetToSend: " << packetToSend << endl;
+		_outputFile << _currentTime << ": " << packetToSend.getID() << endl; //send packet
 		_currentTime += packetToSend.getLength(); // increment time after each packet is sent
 	}
 }
@@ -56,6 +58,10 @@ void Scheduler::getPacketsUpToCurrentTime(Packet& lastPacketReceived, int& lastW
 	if (_currentTime < lastPacketReceived.getArrivalTime() && !_flowsData.empty())
 	{
 		return;
+	}
+	if (_flowsData.empty())
+	{
+		_currentTime = lastPacketReceived.getArrivalTime();
 	}
 	do
 	{	// add last packet to data struct until current time allows
