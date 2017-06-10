@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	{
 		return 1;
 	}*/   //todo: uncomment
-	Scheduler scheduler(1, 10);
+	Scheduler scheduler(8, 10);
 	bool isSuccess = scheduler.init("inp2.txt", "out.txt");
 	if (!isSuccess)
 	{
