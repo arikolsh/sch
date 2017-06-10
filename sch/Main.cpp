@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 	/*if (!validCmdArgs(argc, argv, schedulerType, input_file, output_file, default_weight, quantum))
 	{
 		return 1;
-	}*/
+	}*/   //todo: uncomment
 	Scheduler scheduler(1, 2);
 	bool isSuccess = scheduler.init("inp1.txt", "out.txt");
 	if (!isSuccess)

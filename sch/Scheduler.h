@@ -25,6 +25,4 @@ public:
 	* the actual weight of the flow was already determined and put in the flows Data structure.
 	*/
 	Packet getPacketFromFile(int& weight);
-	/* read packets from file up to given time */
-	void getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight);
 };

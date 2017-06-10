@@ -80,6 +80,10 @@ Packet SchedulerData::getNextPacketToSend(int& currFlow)
 			flowQueue.pop(); //pop packet from queue
 			_totalPackets--;
 			credit = MAX(credit - packet.getLength(), 0);
+			if (flowQueue.empty() || credit < (flowQueue.front()).getLength())
+			{
+				currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
+			}
 			return packet;
 		}
 		// credit not enough for current flow, proceed to next flow

@@ -99,17 +99,3 @@ Packet Scheduler::getPacketFromFile(int& weight)
 	packet = Packet(pktID, pktTime, pktLen, flowID); //-> valid packet
 	return packet;
 }
-
-void Scheduler::getPacketsUpToCurrentTime(Packet& lastReceivedPacket, int& lastReceivedPacketWeight)
-{
-	if (_isEOF || _currentTime < lastReceivedPacket.getArrivalTime())
-	{
-		return;
-	}
-	do
-	{	// add last packet to data struct until current time allows
-		_flowsData.addPacket(lastReceivedPacket, lastReceivedPacketWeight);
-		lastReceivedPacket = getPacketFromFile(lastReceivedPacketWeight);
-
-	} while (!_isEOF && lastReceivedPacket.getArrivalTime() <= _currentTime);
-}
