@@ -55,11 +55,13 @@ void Scheduler::start()
 			_currentTime = _lastReceivedPacket.getArrivalTime();
 			continue;
 		}
-		Packet packet = _flowsData.getNextPacketToSend(_currentFlowIndex);
-		
-		_outputFile << _currentTime << ": " << packet.getID() << endl; //send packet
-
-		_currentTime += packet.getLength();
+		//Packet packet = _flowsData.getNextPacketToSend(_currentFlowIndex);
+		vector<Packet> readyPackets = _flowsData.getNextPacketsToSend(_currentFlowIndex);
+		for (int i = 0; i < readyPackets.size(); i++)
+		{
+			_outputFile << _currentTime << ": " << readyPackets[i].getID() << endl; //send packet
+			_currentTime += readyPackets[i].getLength();
+		}
 	}
 
 }
