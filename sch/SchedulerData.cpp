@@ -1,4 +1,5 @@
 #include "SchedulerData.h"
+#include <iostream>
 using namespace std;
 SchedulerData::SchedulerData(int quantum) : _quantum(quantum)
 {
@@ -82,6 +83,7 @@ vector<Packet> SchedulerData::getNextPacketsToSend(int& currFlow)
 	vector<Packet> packetsToSend;
 	auto MAX = [](auto a, auto b) { return (a > b) ? a : b; };
 	while (true) {
+		if (currFlow >= _allFlowTuples.size()) currFlow -= 1; //patch
 		while (get<0>(_allFlowTuples[currFlow]).empty()) //traverse flows until found non empty flow
 		{
 			get<2>(_allFlowTuples[currFlow]) = 0; //second time we arrived to this flow, zero credit
@@ -92,21 +94,26 @@ vector<Packet> SchedulerData::getNextPacketsToSend(int& currFlow)
 		Packet packet = flowQueue.front(); //get packet from queue
 		int weight = get<1>(_allFlowTuples[currFlow]);
 		int& credit = get<2>(_allFlowTuples[currFlow]);
-		credit += weight*_quantum;
+	//	cout << "CREDIT BEFORE: " << credit << ",PACKET: " << packet << endl;
+		credit += weight*_quantum; // if already was here, dont do this
+	//	cout << "CREDIT: " << credit << ",PACKET: " << packet << endl;
 		while (packet.getLength() <= credit) {
+			//cout << "CREDIT: " << credit << ",PACKET: " << packet << endl;
 			flowQueue.pop(); //pop packet from queue
 			_totalPackets--;
 			credit = MAX(credit - packet.getLength(), 0);
 			packetsToSend.push_back(packet);
 			if (flowQueue.empty())
 			{
-				credit = 0;
+				//credit = 0;
 				break;
 			}
 			packet = flowQueue.front();
 		}
 		// credit not enough for current flow, proceed to next flow
+		int lastflow = currFlow;
 		currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
+		if (lastflow == currFlow) currFlow += 1; //patch
 		if (packetsToSend.size() > 0) { return packetsToSend; }
 	}
 }

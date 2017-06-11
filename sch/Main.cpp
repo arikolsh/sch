@@ -7,12 +7,12 @@ int main(int argc, char* argv[])
 {
 	string schedulerType, input_file, output_file;
 	int default_weight, quantum;
-	/*if (!validCmdArgs(argc, argv, schedulerType, input_file, output_file, default_weight, quantum))
+	if (!validCmdArgs(argc, argv, schedulerType, input_file, output_file, default_weight, quantum))
 	{
 		return 1;
-	}*/   //todo: uncomment
-	Scheduler scheduler(8, 10);
-	bool isSuccess = scheduler.init("inp2.txt", "out.txt");
+	}
+	Scheduler scheduler(default_weight, quantum);
+	bool isSuccess = scheduler.init("inp3.txt", "out.txt");
 	if (!isSuccess)
 	{
 		return 1;
