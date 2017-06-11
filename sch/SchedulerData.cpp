@@ -1,6 +1,7 @@
 #include "SchedulerData.h"
-#include <iostream>
+
 using namespace std;
+
 SchedulerData::SchedulerData(int quantum) : _quantum(quantum)
 {
 }
@@ -26,7 +27,6 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 	{
 		return;
 	}
-	//cout << "adding packet: " << packet << endl;
 	Packet packetReceived = packet;
 	if (_flows.find(packetReceived.getFlowID()) != _flows.end()) // flow already in dataStruct
 	{
@@ -46,39 +46,7 @@ void SchedulerData::addPacket(Packet& packet, int weight)
 	_totalPackets++;
 }
 
-Packet SchedulerData::getNextPacketToSend(int& currFlow)
-{
-	auto MAX = [](auto a, auto b) { return (a > b) ? a : b; };
-	while (true) {
-		while (get<0>(_allFlowTuples[currFlow]).empty()) //traverse flows until found non empty flow
-		{
-			get<2>(_allFlowTuples[currFlow]) = 0; //second time we arrived to this flow, zero credit
-			currFlow = (currFlow + 1) % _allFlowTuples.size();
-		}
-		// found non-empty flow
-		queue<Packet>& flowQueue = get<0>(_allFlowTuples[currFlow]);
-		Packet packet = flowQueue.front(); //get packet from queue
-		int weight = get<1>(_allFlowTuples[currFlow]);
-		int& credit = get<2>(_allFlowTuples[currFlow]);
-		credit += weight*_quantum;
-		if (packet.getLength() <= credit)
-		{ //able to send
-			flowQueue.pop(); //pop packet from queue
-			_totalPackets--;
-			credit = MAX(credit - packet.getLength(), 0);
-			if (flowQueue.empty() || credit < (flowQueue.front()).getLength())
-			{
-				if (flowQueue.empty()) { credit = 0; }
-				currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
-			}
-			return packet;
-		}
-		// credit not enough for current flow, proceed to next flow
-		currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
-	}
-}
-
-vector<Packet> SchedulerData::getNextPacketsToSend(int& currFlow)
+vector<Packet> SchedulerData::getPacketsToSend_DRR(int& currFlow)
 {
 	vector<Packet> packetsToSend;
 	auto MAX = [](auto a, auto b) { return (a > b) ? a : b; };
@@ -94,18 +62,14 @@ vector<Packet> SchedulerData::getNextPacketsToSend(int& currFlow)
 		Packet packet = flowQueue.front(); //get packet from queue
 		int weight = get<1>(_allFlowTuples[currFlow]);
 		int& credit = get<2>(_allFlowTuples[currFlow]);
-	//	cout << "CREDIT BEFORE: " << credit << ",PACKET: " << packet << endl;
 		credit += weight*_quantum; // if already was here, dont do this
-	//	cout << "CREDIT: " << credit << ",PACKET: " << packet << endl;
 		while (packet.getLength() <= credit) {
-			//cout << "CREDIT: " << credit << ",PACKET: " << packet << endl;
 			flowQueue.pop(); //pop packet from queue
 			_totalPackets--;
 			credit = MAX(credit - packet.getLength(), 0);
 			packetsToSend.push_back(packet);
 			if (flowQueue.empty())
 			{
-				//credit = 0;
 				break;
 			}
 			packet = flowQueue.front();
@@ -113,8 +77,7 @@ vector<Packet> SchedulerData::getNextPacketsToSend(int& currFlow)
 		// credit not enough for current flow, proceed to next flow
 		int lastflow = currFlow;
 		currFlow = (currFlow + 1) % _allFlowTuples.size(); // Go to next flow
-		if (lastflow == currFlow) currFlow += 1; //patch
+		if (lastflow == currFlow) currFlow += 1;
 		if (packetsToSend.size() > 0) { return packetsToSend; }
 	}
 }
-

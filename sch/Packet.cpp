@@ -1,4 +1,3 @@
-
 #include "Packet.h"
 
 Packet::Packet() : _ID(-1), _arrivalTime(0), _length(0)

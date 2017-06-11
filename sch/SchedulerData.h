@@ -1,16 +1,11 @@
 #pragma once
 #include <vector>
-#include <queue>
+#include "queue"
 #include "Packet.h"
-#include <memory>
 #include <map>
-#include <fstream>
 
 class SchedulerData
 {
-	//todo: setters and getters.. and put members in private
-	long _totalPackets = 0;
-	int _quantum;
 public:
 	explicit SchedulerData(int quantum);
 	bool isEmpty() const { return _totalPackets <= 0; }
@@ -22,6 +17,7 @@ public:
 	* of its specific packet queue in _allFlowTuples. */
 	std::map<std::string, int> _flows;
 	void SchedulerData::addPacket(Packet& packet, int weight);
-	Packet getNextPacketToSend(int& currFlow);
-	std::vector<Packet> getNextPacketsToSend(int& currFlow);
+	std::vector<Packet> getPacketsToSend_DRR(int& currFlow);
+	long _totalPackets = 0;
+	int _quantum;
 };
