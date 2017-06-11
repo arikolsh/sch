@@ -13,6 +13,7 @@ class Scheduler
 	int _lastReceivedPacketWeight;
 	int _currentTime;
 	int _currentFlowIndex;
+	bool _currFlowChanged=false;
 public:
 
 	explicit Scheduler(int weight, int quantum);

@@ -38,10 +38,12 @@ void Scheduler::start()
 {
 	_lastReceivedPacket = Packet(); //default constructor -> id is -1, will be dropped in addPacket (first iteration)
 	while (true) {
+		//cout << "CURRENT FLOW INDEX: " << _currentFlowIndex << endl;
 		//get packets from file until(including) current time
 		while (_lastReceivedPacket.getArrivalTime() <= _currentTime && !_isEOF)
 		{
 			//add last packet from previous getPacketFromFile
+			//if (_lastReceivedPacket.getID() >= 0) cout << "ADDING PACKET: " << _lastReceivedPacket << endl;
 			_flowsData.addPacket(_lastReceivedPacket, _lastReceivedPacketWeight);
 
 			//get next packet from file, update _lastReceivedPacketWeight and _isEOF
@@ -52,17 +54,23 @@ void Scheduler::start()
 			if (_isEOF) { break; } //reached end of file and no more packets to send
 			_flowsData.resetAllFlowsCredit();
 			_currentFlowIndex = 0;
+			_currFlowChanged = true;
 			_currentTime = _lastReceivedPacket.getArrivalTime();
 			_flowsData.clear();
+			//cout << "CURRENT FLOW INDEX: " << _currentFlowIndex << endl;
 			continue;
 		}
 		//Packet packet = _flowsData.getNextPacketToSend(_currentFlowIndex);
 		vector<Packet> readyPackets = _flowsData.getNextPacketsToSend(_currentFlowIndex);
 		for (int i = 0; i < readyPackets.size(); i++)
 		{
+			//cout << _currentTime << ": " << readyPackets[i] << " SENT" << endl; //send packet
 			_outputFile << _currentTime << ": " << readyPackets[i].getID() << endl; //send packet
 			_currentTime += readyPackets[i].getLength();
+			//cout << "CURRENT TIME: " << _currentTime << endl;
 		}
+		//cout << "CURRENT FLOW INDEX: " << _currentFlowIndex << endl;
+
 	}
 
 }
